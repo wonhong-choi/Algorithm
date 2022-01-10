@@ -2,7 +2,7 @@
  * LECTURE03.cpp
  *
  *  Created on: Aug 17, 2021
- *      Author: choewonhong
+ *      Author: choiwonhong
  */
 
 
