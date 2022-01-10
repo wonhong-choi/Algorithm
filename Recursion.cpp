@@ -2,7 +2,7 @@
  * LECTRUE04.cpp
  *
  *  Created on: Aug 31, 2021
- *      Author: choewonhong
+ *      Author: choiwonhong
  */
 
 #include <iostream>
