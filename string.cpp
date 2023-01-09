@@ -4,6 +4,7 @@
 #include <vector>
 #include <string.h>
 #include <algorithm>
+#include <unordered_set>
 
 using namespace std;
 
@@ -431,6 +432,190 @@ vector<int> patternSearchingRabinKarp(const string& txt, const string& pattern){
     return matching;
 }
 
+// Longest proper prefix which is suffix
+// naive solution
+// T/C: O(n^3)
+int getLPSOfString(const string& str, int n){
+    for(int len=n-1; len>0; --len){
+        bool found=true;
+        for(int i=0; i<len; ++i){
+            if(str[i]!=str[n-len+i]){
+                found=false;
+                break;
+            }
+        }
+        if(found){
+            return len;
+        }
+    }
+    return 0;
+}
+vector<int> getLPSVector(const string& str){
+    vector<int> lps(str.size(), 0);
+    for(int i=0; i<lps.size(); ++i){
+        lps[i]=getLPSOfString(str, i+1);
+    }
+    return lps;
+}
+
+// Answer Solution
+// T/C: O(n)
+// IDEA : 
+//      1) let, len=lps[i-1], 
+//      2) if, str[len]==str[i], lps[i]=len+1
+//      3) else, if len==0, lps[i]=0
+//      4)       else recursively, len=lps[len-1]
+vector<int> getLPS(const string& str){
+    vector<int> lps(str.size(), 0);
+    int len=0;
+    int i=1;
+    while(i<str.size()){
+        if(str[i]==str[len]){
+            len++;
+            lps[i]=len;
+            i++;
+        }
+        else{
+            if(len==0){
+                lps[i]=0;
+                i++;
+            }
+            else{
+                len=lps[len-1];
+            }
+        }
+    }
+    return lps;
+}
+
+// KMP algorithm
+// T/C: O(n)
+// S/C: O(m)
+vector<int> kmp(const string& txt, const string& pattern){
+    vector<int> lps=getLPS(pattern);
+    vector<int> matched;
+    int i=0, j=0;
+    while(i<txt.size()){
+        if(txt[i]==pattern[j]){
+            i++;
+            j++;
+        }
+        if(j==pattern.size()){
+            matched.push_back(i-j);
+            j=lps[j-1];
+        }
+        else if(i<txt.size() && txt[i]!=pattern[j]){
+            if(j==0){
+                i++;
+            }
+            else{
+                j=lps[j-1];
+            }
+        }
+    }
+    return matched;
+}
+
+// Check if Strings are Rotations
+// using kmp
+// T/C: O(m)
+// S/C: O(m)
+bool areRotatedStrings(const string& s1, const string& s2){
+    if(s1.size()!=s2.size()){
+        return false;
+    }
+    vector<int> lps=getLPS(s2);
+    vector<int> matched=kmp(s1+s1.substr(0,s1.size()-1), s2);
+    return matched.size()>0 ? true : false;
+}
+
+// usin STL
+// T/C: O(m)
+// S/C: O(m)
+bool areRotatedStringsBySTL(const string& s1, const string& s2){
+    if(s1.size()!=s2.size()){
+        return false;
+    }
+    return (s1+s1).find(s2)!=string::npos;  // O(n)
+}
+
+// Anagram Search
+// naive anagram matching
+// T/C : O((n-m+1)*CHAR)
+bool anagramSearch(const string& txt, const string& pattern){
+    if(txt.size() < pattern.size()){
+        return false;
+    }
+
+    for(int i=0; i<=txt.size()-pattern.size();++i){
+        if(isAnagramOptimized(txt.substr(i, pattern.size()), pattern)){
+            return true;
+        }
+    }
+    return false;
+}
+
+// using Robin-karp algorithm
+// T/C : O((n-m+1)*CHAR)
+bool anagramSearchByRobinKarp(const string& txt, const string& pattern){
+    if(txt.size() < pattern.size()){
+        return false;
+    }
+    int patternHash=0;
+    for(char c : pattern){
+        patternHash+=c;
+    }
+    
+    int i=0;
+    int curHash=0;
+    for(i=0; i<pattern.size(); ++i){
+        curHash+=txt[i];
+    }
+    if(curHash==patternHash && isAnagramOptimized(txt.substr(0,pattern.size()), pattern)){
+        return true;
+    }
+    for(i; i<txt.size();++i){
+        curHash-=txt[i-pattern.size()];
+        curHash+=txt[i];
+        if(curHash==patternHash && isAnagramOptimized(txt.substr(i-pattern.size()+1,pattern.size()), pattern)){
+           return true;
+        }
+    }
+    return false;
+}
+
+// Lexicographic Rank of a string
+long long factorial(int n){
+    long long fact=1;
+    for(int i=2; i<=n;++i){
+        fact*=i;
+    }
+    return fact;
+}
+// Suppose : All characters in str are distinct and also in lowercase.
+long long lexicographicRank(const string& str){
+    long long rank=0;
+    long long mul=factorial(str.size());
+    vector<int> counter(26,0);
+    for(int i=0; i<str.size(); ++i){
+        counter[str[i]-'a']++;
+    }
+    for(int i=1; i<counter.size();++i){
+        counter[i]+=counter[i-1];
+    }
+
+    for(int i=0; i<str.size(); ++i){
+        mul/=(str.size()-i);
+        rank += mul * (counter[str[i]-'a']-1);
+
+        for(int j=(str[i]-'a'); j<26;++j){
+            counter[j]--;
+        }
+    }
+    return rank+1;
+}
+
+
 
 int main(){
     //printFrequencies("geeksforgeeks");
@@ -441,9 +626,15 @@ int main(){
     //cout << leftMostMostOptimized("cabbad") << endl;
     // cout << leftMostNonOptimized("abbcbda") << endl;
     //cout << reverseWordsStack("welcome to gfg") << endl;
-    auto vec = patternSearchingRabinKarp("abcaada", "abc");
-    for(auto v : vec){
-        cout << v << endl;
-    }
+    // auto vec = patternSearchingRabinKarp("abcaada", "abc");
+    // auto vec=getLPS("aaabaaaac");
+    // auto vec = kmp("ababcababaad","ababa");
+    // for(auto v : vec){
+    //     cout << v << endl;
+    // }
+    //cout << boolalpha << areRotatedStringsBySTL("ABAB", "ABAB") << endl;
+    // cout << boolalpha << anagramSearch("geeksforgeeks", "frog") << endl;
+    cout << lexicographicRank("string") << endl;
+    
     return 0;
 }
