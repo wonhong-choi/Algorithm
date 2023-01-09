@@ -391,7 +391,7 @@ vector<int> patternSearchingImproved(const string& txt, const string& pattern){
 //        likely, rolling hash function takes just O(1) to calculate H(s[i+1:i+1+m]) from H(s[i:i+m])
 
 // when, using hash function as just sum of window
-vector<int> patternSearchingImproved(const string& txt, const string& pattern){
+vector<int> patternSearchingRabinKarp(const string& txt, const string& pattern){
     int patternHash=0;
     for(char c : pattern){
         patternHash+=c;
@@ -441,7 +441,7 @@ int main(){
     //cout << leftMostMostOptimized("cabbad") << endl;
     // cout << leftMostNonOptimized("abbcbda") << endl;
     //cout << reverseWordsStack("welcome to gfg") << endl;
-    auto vec = patternSearchingImproved("abcaada", "abd");
+    auto vec = patternSearchingRabinKarp("abcaada", "abc");
     for(auto v : vec){
         cout << v << endl;
     }
