@@ -615,6 +615,97 @@ long long lexicographicRank(const string& str){
     return rank+1;
 }
 
+// Longest Substring with Distinct Characters
+// naive solution
+// T/C : O(n^3)
+bool isDistinct(const string& str, int start, int end){
+    vector<bool> visited(26,false);
+    for(int i=start; i<=end; ++i){
+        if(visited[str[i]-'a']){
+            return false;
+        }
+        visited[str[i]-'a']=true;
+    }
+    return true;
+}
+int longestSubstringNaive(const string& str){
+    int longest=0;
+    for(int i=0; i<str.size(); ++i){
+        for(int j=i; j<str.size(); ++j){
+            if(isDistinct(str,i,j)){
+                longest=max(longest, j-i+1);
+            }
+        }
+    }
+    return longest;
+}
+
+// efficient naive solution
+int longestSubstringEfficientNaive(const string& str){
+    int longest=0;
+    for(int i=0; i<str.size(); ++i){
+        vector<bool> visited(26, false);
+        for(int j=i; j<str.size(); ++j){
+            if(visited[str[j]-'a']){
+                break;
+            }
+            else{
+                longest=max(longest, j-i+1);
+                visited[str[j]-'a']=true;
+            }
+        }
+    }
+    return longest;
+}
+
+// two point solution
+// T/C : O(n)
+bool isDistinct(const vector<int>& counter){
+    for(int i=0; i<counter.size(); ++i){
+        if(counter[i]>1){
+            return false;
+        }
+    }
+    return true;
+}
+
+int longestSubstring(const string& str){
+    int left=0,right=0;
+    int maxLongest=0;
+    vector<int> curWindow(26,0);
+    while(right<str.size()){
+        curWindow[str[right]-'a']++;
+        right++;
+        if(isDistinct(curWindow)){
+            maxLongest=max(maxLongest, right-left);
+        }
+        else{
+            while(left<=right && !isDistinct(curWindow)){
+                curWindow[str[left]-'a']--;
+                left++;
+            }
+        }
+    }
+    return maxLongest;
+}
+
+// maxEnd(j) solution
+// IDEA : maxEnd(j)-> length of the longest substring that has distinct characters and end with j.
+//          calculate longest substring which is end in index j. by using previous index of same character.
+//          maxEnd(j)= maxEnd(j-1)+1. if str[j] is not present in maxEnd(j-1)
+//                     j-prev[str[j]]+1. if str[j] is present in maxEnd(j-1)
+int longestSubstringMaxEnd(const string& str){
+    int start=0;
+    int longest=0;
+    vector<int> prev(26, -1);   // previous index of character.
+    for(int j=0; j<str.size(); ++j){
+        start=max(start, prev[str[j]-'a']+1);   //update distinct start index.
+        longest=max(longest, j-start+1);
+        prev[str[j]-'a']=j;
+    }
+    return longest;
+}
+
 
 
 int main(){
@@ -634,7 +725,8 @@ int main(){
     // }
     //cout << boolalpha << areRotatedStringsBySTL("ABAB", "ABAB") << endl;
     // cout << boolalpha << anagramSearch("geeksforgeeks", "frog") << endl;
-    cout << lexicographicRank("string") << endl;
+    //cout << lexicographicRank("string") << endl;
+    cout << longestSubstring("") << endl;
     
     return 0;
 }
