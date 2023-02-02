@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <stack>
 
 using namespace std;
 
@@ -194,10 +195,12 @@ void BFS_Disconnected(vector<int> adj[], int v){
             }
         }
     }
+    printf("\n");
 }
 
 // Counting Connected Components in an undirected graph
-int connectedComponent(vector<int> adj[], int v){
+// By BFS Based
+int connectedComponentBFS(vector<int> adj[], int v){
     vector<bool> visited(v, false);
     queue<int> q;
 
@@ -226,7 +229,103 @@ int connectedComponent(vector<int> adj[], int v){
     return island;
 }
 
-int main(){
+// DFS : Given src
+void DFS(vector<int> adj[], int v, int src){
+    stack<int> st;
+    vector<bool> visited(v, false);
 
+    st.push(src);
+    
+    while(!st.empty()){
+        int cur=st.top();
+        st.pop();
+        if(!visited[cur]){
+            visited[cur]=true;
+
+            printf("%d -> ", cur);
+            for(int neighbor : adj[cur]){
+                if(!visited[neighbor]){
+                    st.push(neighbor);
+                }
+            }
+        }
+    }
+    printf("\n");
+}
+
+// DFS 
+//      No Source Given and Graph may be disconnected
+// T/C : O(v+e)
+void DFS_Disconnected(vector<int> adj[], int v){
+    stack<int> st;
+    vector<bool> visited(v, false);
+
+    for(int i=0; i<v; ++i){
+        if(!visited[i]){
+            st.push(i);
+
+            while(!st.empty()){
+                int cur=st.top();
+                st.pop();
+
+                if(!visited[cur]){
+                    visited[cur]=true;
+                    printf("%d -> ", cur);
+
+                    for(int neighbor : adj[cur]){
+                        if(!visited[neighbor]){
+                            st.push(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    printf("\n");
+}
+
+// Counting Connected Components in an undirected graph
+// By DFS Based
+int connectedComponentDFS(vector<int> adj[], int v){
+    stack<int> st;
+    vector<bool> visited(v, false);
+
+    int island=0;
+    for(int i=0; i<v; ++i){
+        if(!visited[i]){
+            st.push(i);
+
+            while(!st.empty()){
+                int cur=st.top();
+                st.pop();
+
+                if(!visited[cur]){
+                    visited[cur]=true;
+
+                    for(int neighbor : adj[cur]){
+                        if(!visited[neighbor]){
+                            st.push(neighbor);
+                        }
+                    }
+                }
+            }
+            ++island;
+        }
+    }
+    return island;
+}
+
+int main(){
+    vector<int> adj[6];
+    adj[0].push_back(1);
+    adj[1].push_back(0);
+
+    adj[2].push_back(3);
+    adj[2].push_back(4);
+    adj[3].push_back(2);
+    adj[4].push_back(2);
+    
+
+    cout << connectedComponentDFS(adj, 6);
     return 0;
 }
