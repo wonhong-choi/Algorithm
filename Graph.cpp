@@ -1,12 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 using namespace std;
 
 /*
-    GRAPH
-
+GRAPH
     1) Graph Representation
         1-1) Adjacency Matrix
             Operations:
@@ -16,8 +16,16 @@ using namespace std;
                 Find degree of U : O(v)
                 Add/Remove an edge : O(1)
                 Add/Remove an vertix : O(v*v)
-        
 
+        1-2) Adjacency List, when using Dynamic sized array
+            Operations:
+                space : O(v + e)
+                Check if u and v are adjacent : O(v)
+                Find all vertices adjacent to u : O(degree(v))
+                Find degree of U : O(1)
+                Add an edge : O(1)
+                Remove an edge : O(v)
+                Add/Remove an vertix : O(1)
 */
 
 // undirected graph
@@ -87,19 +95,6 @@ public:
     }
 };
 
-    /*
-        1-2) Adjacency List, when using Dynamic sized array
-            Operations:
-                space : O(v + e)
-                Check if u and v are adjacent : O(v)
-                Find all vertices adjacent to u : O(degree(v))
-                Find degree of U : O(1)
-                Add an edge : O(1)
-                Remove an edge : O(v)
-                Add/Remove an vertix : O(1)
-    */
-    
-
 class Graph_AdjacencyList{
 private:
     vector<vector<int>> adj;
@@ -147,6 +142,89 @@ public:
         adj.erase(adj.begin()+u);
     }
 };
+
+// BFS : Given src
+void BFS(vector<int> adj[], int v, int src){
+    vector<bool> visited(v, false);
+
+    queue<int> q;
+    q.push(src);
+    visited[src]=true;
+
+    while(!q.empty()){
+        int cur=q.front();
+        q.pop();
+
+        printf("%d -> ", cur);
+
+        for(int neighbor : adj[cur]){
+            if(!visited[neighbor]){
+                q.push(neighbor);
+                visited[neighbor]=true;
+            }
+        }
+    }
+    printf("\n");
+}
+
+// BFS 
+//      No Source Given and Graph may be disconnected
+// T/C : O(v+e)
+void BFS_Disconnected(vector<int> adj[], int v){
+    vector<bool> visited(v, false);
+    queue<int> q;
+
+    for(int i=0; i<v; ++i){
+        if(!visited[i]){
+            q.push(i);
+            visited[i]=true;
+
+            while(!q.empty()){
+                int cur=q.front();
+                q.pop();
+
+                printf("%d -> ", cur);
+
+                for(int neighbor : adj[cur]){
+                    if(!visited[neighbor]){
+                        q.push(neighbor);
+                        visited[neighbor]=true;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Counting Connected Components in an undirected graph
+int connectedComponent(vector<int> adj[], int v){
+    vector<bool> visited(v, false);
+    queue<int> q;
+
+    int island=0;
+    for(int i=0; i<v; ++i){
+        if(!visited[i]){
+            q.push(i);
+            visited[i]=true;
+
+            while(!q.empty()){
+                int cur=q.front();
+                q.pop();
+
+                printf("%d -> ", cur);
+
+                for(int neighbor : adj[cur]){
+                    if(!visited[neighbor]){
+                        q.push(neighbor);
+                        visited[neighbor]=true;
+                    }
+                }
+            }
+            ++island;
+        }
+    }
+    return island;
+}
 
 int main(){
 
