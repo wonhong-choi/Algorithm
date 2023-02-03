@@ -373,28 +373,46 @@ bool isCyclic(vector<int> adj[], int v){
     return false;
 }
 
+// Detect Cycle in directed Graph
+// IDEA : DFS Based
+// T/C : O(v+e)
+bool isCyclicRecurDirected(vector<int> adj[], vector<bool>& visited, vector<bool>& recSt, int cur){
+    visited[cur]=true;
+    recSt[cur]=true;
+
+    for(int neighbor : adj[cur]){
+        if(!visited[neighbor] && isCyclicRecurDirected(adj, visited, recSt, neighbor)){
+            return true;
+        }
+        else if(recSt[neighbor]){
+            return true;
+        }
+    }
+    recSt[cur]=false;
+    return false;
+}
+
+bool isCyclicDirected(vector<int> adj[], int v){
+    vector<bool> visited(v, false), recSt(v,false);
+
+    for(int i=0; i<v; ++i){
+        if(!visited[i]){
+            if(isCyclicRecurDirected(adj, visited, recSt, i)){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 int main(){
-    vector<int> adj[6];
+    vector<int> adj[3];
     
     adj[0].push_back(1);
 
-    adj[1].push_back(0);
-    adj[1].push_back(2);
-    adj[1].push_back(3);
-    
     adj[2].push_back(1);
-    adj[2].push_back(3);
-    adj[2].push_back(4);
     
-    adj[3].push_back(1);
-    adj[3].push_back(2);
-
-    adj[4].push_back(2);
-    adj[4].push_back(5);
-    
-    adj[5].push_back(4);
-
-    cout << boolalpha << isCyclic(adj, 4) << endl;
+    cout << boolalpha << isCyclicDirected(adj, 3) << endl;
     return 0;
 }
