@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <queue>
 #include <stack>
+#include <climits>
 
 using namespace std;
 
@@ -315,17 +316,53 @@ int connectedComponentDFS(vector<int> adj[], int v){
     return island;
 }
 
+// Shortest Path in an Unweighted Graph
+// Given an Unweighted Graph and a source point, the task is to find the shortest path between the source point and every other point in the graph.
+// IDEA : BFS
+// T/C : O(v+e)
+// S/C : O(v) for visited
+vector<int> shortestPath(vector<int> adj[], int v, int src){
+    queue<int> q;
+    vector<int> visited(v, -1);
+    visited[src]=0;
+    q.push(src);
+
+    while(!q.empty()){
+        int cur=q.front();
+        q.pop();
+        
+        for(int neighbor : adj[cur]){
+            if(visited[neighbor]==-1){
+                visited[neighbor]=visited[cur]+1;
+                q.push(neighbor);
+            }
+        }
+    }
+    return visited;
+}
+
+
 int main(){
-    vector<int> adj[6];
-    adj[0].push_back(1);
-    adj[1].push_back(0);
-
-    adj[2].push_back(3);
-    adj[2].push_back(4);
-    adj[3].push_back(2);
-    adj[4].push_back(2);
+    vector<int> adj[4];
     
+    adj[0].push_back(1);
+    adj[0].push_back(2);
 
-    cout << connectedComponentDFS(adj, 6);
+    adj[1].push_back(0);
+    adj[1].push_back(2);
+    adj[1].push_back(3);
+    
+    adj[2].push_back(0);
+    adj[2].push_back(1);
+    adj[2].push_back(3);
+    
+    adj[3].push_back(1);
+    adj[3].push_back(2);
+
+    vector<int> sp = shortestPath(adj, 4, 0);
+    for(int num : sp){
+        cout << num << " ";
+    }
+    cout << endl;
     return 0;
 }
