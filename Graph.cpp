@@ -341,28 +341,60 @@ vector<int> shortestPath(vector<int> adj[], int v, int src){
     return visited;
 }
 
+// Detect Cycle in Undirected Graph
+// IDEA : DFS Based
+// T/C : O(v+e)
+bool isCyclicRecur(vector<int> adj[], vector<bool>& visited, int cur, int prev){
+    visited[cur]=true;
+
+    for(int neighbor : adj[cur]){
+        if(!visited[neighbor]){
+            if(isCyclicRecur(adj, visited, neighbor, prev)){
+                return true;
+            }
+        }
+        else if(neighbor!=prev){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isCyclic(vector<int> adj[], int v){
+    vector<bool> visited(v, false);
+
+    for(int i=0; i<v;++i){
+        if(!visited[i]){
+            if(isCyclicRecur(adj, visited, i, -1)){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 int main(){
-    vector<int> adj[4];
+    vector<int> adj[6];
     
     adj[0].push_back(1);
-    adj[0].push_back(2);
 
     adj[1].push_back(0);
     adj[1].push_back(2);
     adj[1].push_back(3);
     
-    adj[2].push_back(0);
     adj[2].push_back(1);
     adj[2].push_back(3);
+    adj[2].push_back(4);
     
     adj[3].push_back(1);
     adj[3].push_back(2);
 
-    vector<int> sp = shortestPath(adj, 4, 0);
-    for(int num : sp){
-        cout << num << " ";
-    }
-    cout << endl;
+    adj[4].push_back(2);
+    adj[4].push_back(5);
+    
+    adj[5].push_back(4);
+
+    cout << boolalpha << isCyclic(adj, 4) << endl;
     return 0;
 }
