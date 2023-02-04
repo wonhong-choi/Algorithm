@@ -405,14 +405,61 @@ bool isCyclicDirected(vector<int> adj[], int v){
     return false;
 }
 
+// Topological Sorting
+// IDEA : BFS based using Kahn's algorithm
+// T/C : O(v+e)
+// S/C : O(v)
+vector<int> topologicalSorting(vector<int> adj[], int v){
+    vector<int> indegree(v,0);
+    for(int i=0; i<v;++i){
+        for(int neighbor : adj[i]){
+            indegree[neighbor]++;
+        }
+    }
+
+    queue<int> q;
+    for(int i=0; i<v; ++i){
+        if(indegree[i]==0){
+            q.push(i);
+        }
+    }
+
+    vector<int> sorted;
+    while(!q.empty()){
+        int cur=q.front();
+        q.pop();
+
+        sorted.push_back(cur);
+
+        for(int neighbor : adj[cur]){
+            indegree[neighbor]--;
+            if(indegree[neighbor]==0){
+                q.push(neighbor);
+            }
+        }
+    }
+    return sorted;
+}
 
 int main(){
-    vector<int> adj[3];
+    vector<int> adj[6];
     
     adj[0].push_back(1);
+    adj[0].push_back(2);
+    adj[1].push_back(3);
 
-    adj[2].push_back(1);
+
+    adj[2].push_back(3);
+
+    adj[3].push_back(4);
+    adj[3].push_back(5);
+   // adj[2].push_back(1);
     
-    cout << boolalpha << isCyclicDirected(adj, 3) << endl;
+    vector<int> sorted=topologicalSorting(adj, 6);
+    
+    for(int vertex : sorted){
+        cout << vertex << " ";
+    }
+    cout << endl;
     return 0;
 }
