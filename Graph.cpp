@@ -441,6 +441,45 @@ vector<int> topologicalSorting(vector<int> adj[], int v){
     return sorted;
 }
 
+// Cycle Detection using Topological Sorting
+// IDEA : BFS based using Kahn's algorithm
+//        if there is/are cycle, topological sorted vector has less than v. (because the vertex which don't have indegree edge is not exist.)
+// T/C : O(v+e)
+// S/C : O(v)
+bool isCyclicBasedTopologicalSort(vector<int> adj[], int v){
+    vector<int> indegree(v,0);
+    for(int i=0; i<v;++i){
+        for(int neighbor : adj[i]){
+            indegree[neighbor]++;
+        }
+    }
+
+    queue<int> q;
+    for(int i=0; i<v; ++i){
+        if(indegree[i]==0){
+            q.push(i);
+        }
+    }
+
+    int count=0;
+    while(!q.empty()){
+        int cur=q.front();
+        q.pop();
+
+        count++;
+
+        for(int neighbor : adj[cur]){
+            indegree[neighbor]--;
+            if(indegree[neighbor]==0){
+                q.push(neighbor);
+            }
+        }
+    }
+    return count!=v;
+}
+
+
+
 int main(){
     vector<int> adj[6];
     
@@ -455,11 +494,6 @@ int main(){
     adj[3].push_back(5);
    // adj[2].push_back(1);
     
-    vector<int> sorted=topologicalSorting(adj, 6);
-    
-    for(int vertex : sorted){
-        cout << vertex << " ";
-    }
-    cout << endl;
+    cout << boolalpha << isCyclicBasedTopologicalSort(adj, 6) << endl;
     return 0;
 }
