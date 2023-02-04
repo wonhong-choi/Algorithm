@@ -478,6 +478,41 @@ bool isCyclicBasedTopologicalSort(vector<int> adj[], int v){
     return count!=v;
 }
 
+// Topological Sorting
+// IDEA : DFS based
+// T/C : O(v+e)
+// S/C : O(v)
+void topologicalSortingDFSRecur(vector<int> adj[], vector<bool>& visited, stack<int>& st, int cur){
+    visited[cur]=true;
+
+    for(int neighbor : adj[cur]){
+        if(!visited[neighbor]){
+            topologicalSortingDFSRecur(adj, visited, st, neighbor);
+        }
+    }
+    st.push(cur);
+}
+
+
+vector<int> topologicalSortingDFS(vector<int> adj[], int v){
+    vector<bool> visited(v, false);
+    stack<int> st;
+
+    for(int i=0; i<v; ++i){
+        if(!visited[i]){
+            topologicalSortingDFSRecur(adj, visited, st, i);
+        }
+    }
+
+    vector<int> sorted;
+    while(!st.empty()){
+        sorted.push_back(st.top());
+        st.pop();
+    }
+    return sorted;
+}
+
+
 
 
 int main(){
