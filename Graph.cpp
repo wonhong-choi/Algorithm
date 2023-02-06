@@ -493,7 +493,6 @@ void topologicalSortingDFSRecur(vector<int> adj[], vector<bool>& visited, stack<
     st.push(cur);
 }
 
-
 vector<int> topologicalSortingDFS(vector<int> adj[], int v){
     vector<bool> visited(v, false);
     stack<int> st;
@@ -513,22 +512,29 @@ vector<int> topologicalSortingDFS(vector<int> adj[], int v){
 }
 
 
+// Shortest Path in Directed Acyclic Graph
+// IDEA : topological sorting
+// T/C : O(v+e)
+// S/C : O(v)
+vector<int> shortestPathDAG(vector<int> adj[], vector<int> weight[], int v, int src){
+    vector<int> topologicalSorted = topologicalSorting(adj, v);
+
+    vector<int> dist(v, INT_MAX);
+
+    for(int u=0; u<topologicalSorted.size(); ++u){
+        for(int v=0; v<adj[u].size(); ++v){
+            int neighbor= adj[u][v];
+
+            dist[neighbor]=min(dist[neighbor], dist[u]+weight[u][v]);
+        }
+    }
+    return dist;
+}
+
 
 
 int main(){
-    vector<int> adj[6];
-    
-    adj[0].push_back(1);
-    adj[0].push_back(2);
-    adj[1].push_back(3);
 
 
-    adj[2].push_back(3);
-
-    adj[3].push_back(4);
-    adj[3].push_back(5);
-   // adj[2].push_back(1);
-    
-    cout << boolalpha << isCyclicBasedTopologicalSort(adj, 6) << endl;
     return 0;
 }
