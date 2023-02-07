@@ -3,6 +3,11 @@
 #include <climits>
 #include <queue>
 #include <utility>
+#include <algorithm>
+
+#include "DisjointSet.cpp"
+
+typedef PathCompressedUnionFind DisjointSet;
 
 using namespace std;
 
@@ -80,6 +85,33 @@ int prim(vector<pair<int,int>> graph[], int n){
             if(!isMstSet[neighbor]){
                 pq.push(make_pair(weight, neighbor));
             }
+        }
+    }
+    return weightSum;
+}
+
+// Kruskal's algorithm
+// IDEA : sort edges, and then, add edge has the lowest weight, not in MST, and don't make a cycle in MST until MST's edge size become v-1.
+//      : add edge which don't make a cycle one by one to MST
+// T/C : O(eloge)
+// S/C : O(e)
+int kruskal(vector<pair<int, pair<int,int>>>& edges, int n){    // edges[i] = {weight, {source, destination}}
+    sort(edges.begin(), edges.end());   // edges sorted ascending by weight
+
+    DisjointSet uf(n);
+
+    int weightSum=0;
+    for(int i=0, count=0; i<edges.size() && count<n-1; ++i){
+        int weight=edges[i].first;
+        int src=edges[i].second.first;
+        int dst=edges[i].second.second;
+
+        if(uf.find(src) != uf.find(dst)){
+            uf.unionSet(src,dst);
+            
+            weightSum+=weight;
+            
+            count++;
         }
     }
     return weightSum;
