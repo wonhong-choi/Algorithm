@@ -531,6 +531,68 @@ vector<int> shortestPathDAG(vector<int> adj[], vector<int> weight[], int v, int 
     return dist;
 }
 
+// Dijkstra's Algorithm
+// Naive approach
+// T/C : O(v^2)
+// S/C : O(v)
+vector<int> dijkstra(const vector<vector<int>>& adj, int n, int src){
+    vector<int> dist(n, INT_MAX);
+    dist[src] = 0;
+    vector<bool> fin(n, false); //finalized
+
+    for(int count=0; count<n-1; ++count){   // last one(the longest vertex from src) do not need to do something
+        // pick shortest one
+        int u=-1;
+        for(int i=0; i<n; ++i){
+            if(!fin[i] && (u==-1 || dist[u] > dist[i])){
+                u = i;
+            }
+        }
+
+        fin[u] = true;
+
+        // relax operation
+        for(int v=0; v < n; ++v){
+            if(adj[u][v] !=0 && !fin[v]){
+                dist[v] = min(dist[v], dist[u] + adj[u][v]);
+            }
+        }
+    }
+    return dist;
+}
+
+// Dijkstra's Algorithm
+// Naive approach
+// T/C : O(vlogv)
+// S/C : O(v)
+vector<int> dijkstraOptimized(const vector<vector<pair<int, int>>>& graph, int n, int src){
+    vector<int> dist(n, INT_MAX);
+    dist[src] = 0;
+
+    priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+    pq.push(make_pair(0, src));
+
+    while(!pq.empty()){
+        int u = pq.top().second;
+        int distU = pq.top().first;
+        pq.pop();
+
+        if(dist[u] < distU){    // already min (==finalized)
+            continue;
+        }
+
+        for(int j=0; j<graph[u].size(); ++j){
+            int v = graph[u][j].first;
+            int w = graph[u][j].second;
+
+            if(dist[v] > w + distU){
+                pq.push(make_pair(w+distU, v));
+            }
+        }
+    }
+    return dist;
+}
+
 
 
 int main(){
