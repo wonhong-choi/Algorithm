@@ -587,6 +587,7 @@ vector<int> dijkstraOptimized(const vector<vector<pair<int, int>>>& graph, int n
 
             if(dist[v] > w + distU){
                 pq.push(make_pair(w+distU, v));
+                dist[v] = w + distU;
             }
         }
     }
