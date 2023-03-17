@@ -4,6 +4,8 @@
 #include <queue>
 #include <stack>
 #include <climits>
+#include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -562,7 +564,7 @@ vector<int> dijkstra(const vector<vector<int>>& adj, int n, int src){
 }
 
 // Dijkstra's Algorithm
-// Naive approach
+// Efficient approach
 // T/C : O(vlogv)
 // S/C : O(v)
 vector<int> dijkstraOptimized(const vector<vector<pair<int, int>>>& graph, int n, int src){
@@ -594,10 +596,83 @@ vector<int> dijkstraOptimized(const vector<vector<pair<int, int>>>& graph, int n
     return dist;
 }
 
+// Bellman Ford Algorithm
+//
+
+
+
+// Kosaraju's Algoritm
+// Strongly connected Components
+// CONDITION:
+//              1) connected graph
+//              2) directed graph
+// IDEA: DFS Based
+//      0) u --> v, u is source, v is sink. so then, search sink first by using dfs. source(u) is NEVER reachable from sink(v)
+//      1) Order the vertices in decreasing order of finish times in DFS (sink first)
+//      2) Reverse all edges
+//      2-1) why reverse all edges?
+//          - reversing edges makes source to sink and sink to source, of course stay strongly connected component
+//          - counter example:  # when not reveresing edges, start from reverse order of step1
+//                  0 -> 1 -> 2
+//                  ^    |  
+//                  | ---3
+//                  [0 1 2 3] order of step1. then, reverse order make component. --> 3-1-0-2 > wrong!
+//      3) Do DFS of the reversed graph in the order obtained in Step1.
+//           For every vertex, print all reachable vertice as one strongly connected component
+// T/C: O(v+e)
+// S/C: O(v+e) for graph, O(v) for stack
+void kosarajuDFS(const vector<vector<int>>& graph, stack<int>& st, vector<bool>& visited, int cur){
+    visited[cur] = true;
+    for(int neighbor : graph.at(cur)){
+        if(!visited[neighbor]){
+            kosarajuDFS(graph, st, visited, neighbor);
+        }
+    }
+    st.push(cur);
+}
+
+void kosarajuDFS3(const vector<vector<int>>& graph, vector<bool>& visited, int cur){
+    visited[cur] = true;
+    cout << cur << " ";
+
+    for(int nei : graph[cur]){
+        if(!visited[nei]){
+            kosarajuDFS3(graph, visited, nei);
+        }
+    }
+}
+
+void kosaraju(const vector<vector<int>>& graph){
+    // step1) decreasing order of finish time.
+    vector<bool> visited(graph.size() + 1, false);
+    stack<int> st;
+    for(int i=0; i<graph.size(); ++i){
+        if(!visited[i])
+            kosarajuDFS(graph, st, visited, i);
+    }
+
+    // step2) reverse all edges
+    vector<vector<int>> reverseGraph(graph.size(), vector<int>());
+    for(int i=0; i<graph.size(); ++i){
+        for(int j=0; j<graph[i].size(); ++j){
+            reverseGraph[j].push_back(i);
+        }
+    }
+
+    // step3) do dfs
+    fill(visited.begin(), visited.end(), false);
+    while(!st.empty()){
+        int cur = st.top();
+        st.pop();
+        if(!visited[cur]){
+            kosarajuDFS3(reverseGraph, visited, cur);
+            cout << endl;
+        }
+    }
+}
 
 
 int main(){
-
-
+    
     return 0;
 }
