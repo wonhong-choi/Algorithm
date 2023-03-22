@@ -597,8 +597,58 @@ vector<int> dijkstraOptimized(const vector<vector<pair<int, int>>>& graph, int n
 }
 
 // Bellman Ford Algorithm
-//
+// IDEA : length 1 > length 2 > length 3 > ... > length n-1 edge
+// T/C : O(v*e)
+// S/C : O(v)
+vector<int> bellmanFord(const vector<vector<pair<int, int>>>& graph, int n, int src){
+    vector<int> dist(n, INT_MAX);
+    dist[src] = 0;
 
+    for(int i=0; i<n-1; ++i){
+        for(int u=0; u<graph.size(); ++u){
+            for(const pair<int,int>& edge : graph[u]){
+                int nei = edge.first;
+                int w = edge.second;
+                if(dist[nei] > dist[u] + w){
+                    dist[nei] = dist[u] + w;
+                }
+            }
+        }
+    }
+    return dist;
+}
+
+// negative cycle detection
+// IDEA : Bellman ford Approach
+// T/C : O(v*e)
+bool negCycleDetection(const vector<vector<pair<int, int>>>& graph, int n, int src){
+    vector<int> dist(n, INT_MAX);
+    dist[src] = 0;
+
+    for(int i=0; i<n-1; ++i){
+        for(int u=0; u<graph.size(); ++u){
+            for(const pair<int,int>& edge : graph[u]){
+                int nei = edge.first;
+                int w = edge.second;
+                if(dist[nei] > dist[u] + w){
+                    dist[nei] = dist[u] + w;
+                }
+            }
+        }
+    }
+
+    for(int u=0; u<graph.size(); ++u){
+        for(const pair<int,int>& edge : graph[u]){
+            int nei = edge.first;
+            int w = edge.second;
+            if(dist[nei] > dist[u] + w){
+                dist[nei] = dist[u] + w;
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 
 // Kosaraju's Algoritm
