@@ -721,6 +721,61 @@ void kosaraju(const vector<vector<int>>& graph){
     }
 }
 
+// Articulation Point
+// IDEA : 
+//      1) Naive : erase one by one vertex, check graph is disconnected > TOO SLOW
+//
+//      2) Root RULE : DFS from one by one vertex, if root has more than child, this vertex is articulation point
+//      3) Non-Root RULE : e(u, v) in DFS tree, low[v] >= dis[u] then, u is articulation point
+void dfsAP(vector<vector<int>>& graph, int cur, vector<bool>& visited, vector<int>& disc, vector<int>& low, int time, int parent, vector<bool>& isAP){
+    visited[cur] = true;
+    int nChildren = 0;
+
+    disc[cur] = low[cur] = ++time;
+    for(int nei : graph[cur]){
+        if(!visited[cur]){
+            nChildren++;
+            dfsAP(graph, nei, visited, disc, low, time, cur, isAP);
+
+            low[cur] = min(low[cur], low[nei]);
+
+            if(parent != -1 && low[nei] >= disc[cur]){
+                isAP[cur] = true;
+            }
+        }
+        else if(nei!=parent){
+            low[cur] = min(low[cur], disc[nei]);
+        }
+    }
+
+    if(parent==-1 && nChildren > 1){
+        isAP[cur] = true;
+    }
+}
+
+vector<int> articualtionPoint(vector<vector<int>>& graph, int n){
+    vector<int> disc(n, 0);
+    vector<int> low(n, 0);
+    vector<bool> visited(n, false);
+    vector<bool> isAP(n, false);
+
+    int time=0;
+    int parent = -1;
+
+    for(int u = 0; u<n; ++u){
+        if(!visited[u]){
+            dfsAP(graph, u, visited, disc, low, time, parent, isAP);
+        }
+    }
+
+    vector<int> aps;
+    for(int i=0; i<n; ++i){
+        if(isAP[i]){
+            aps.push_back(i);
+        }
+    }
+    return aps;
+}
 
 int main(){
     
