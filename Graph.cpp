@@ -727,54 +727,44 @@ void kosaraju(const vector<vector<int>>& graph){
 //
 //      2) Root RULE : DFS from one by one vertex, if root has more than child, this vertex is articulation point
 //      3) Non-Root RULE : e(u, v) in DFS tree, low[v] >= dis[u] then, u is articulation point
-void dfsAP(vector<vector<int>>& graph, int cur, vector<bool>& visited, vector<int>& disc, vector<int>& low, int time, int parent, vector<bool>& isAP){
-    visited[cur] = true;
-    int nChildren = 0;
+void dfsAP(vector<vector<int>>& graph, vector<bool>& visited, vector<int>& disc, vector<int>& low, vector<bool>& isAP, int u, int parent, int time){
+    visited[u] = true;
+    disc[u] = low[u] = ++time;
+    int children = 0;
+    for(int v : graph[u]){
+        if(!visited[v]){
+            ++children;
 
-    disc[cur] = low[cur] = ++time;
-    for(int nei : graph[cur]){
-        if(!visited[cur]){
-            nChildren++;
-            dfsAP(graph, nei, visited, disc, low, time, cur, isAP);
+            dfsAP(graph, visited, disc, low, isAP, v, u, time);
 
-            low[cur] = min(low[cur], low[nei]);
+            low[u] = min(low[u], low[v]);
 
-            if(parent != -1 && low[nei] >= disc[cur]){
-                isAP[cur] = true;
+            if(parent != -1 && low[v] >= disc[u]){
+                isAP[u] = true;
             }
         }
-        else if(nei!=parent){
-            low[cur] = min(low[cur], disc[nei]);
+        else if(v != parent){
+            low[v] = min(low[v], disc[u]);
         }
     }
-
-    if(parent==-1 && nChildren > 1){
-        isAP[cur] = true;
+    if(parent == -1 && children > 1){
+        isAP[u] = true;
     }
 }
 
 vector<int> articualtionPoint(vector<vector<int>>& graph, int n){
+    vector<bool> visited(n, false);
     vector<int> disc(n, 0);
     vector<int> low(n, 0);
-    vector<bool> visited(n, false);
     vector<bool> isAP(n, false);
 
-    int time=0;
     int parent = -1;
-
-    for(int u = 0; u<n; ++u){
-        if(!visited[u]){
-            dfsAP(graph, u, visited, disc, low, time, parent, isAP);
-        }
-    }
-
-    vector<int> aps;
+    int time = 0;
     for(int i=0; i<n; ++i){
-        if(isAP[i]){
-            aps.push_back(i);
+        if(!visited[i]){
+            dfsAP(graph, visited, disc, low, isAP, i, parent, time);
         }
     }
-    return aps;
 }
 
 int main(){
