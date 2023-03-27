@@ -650,10 +650,6 @@ bool negCycleDetection(const vector<vector<pair<int, int>>>& graph, int n, int s
     return false;
 }
 
-// Floyd-Warshall algorithm
-// shortest path problem (all source - all destination)
-
-
 
 // Kosaraju's Algoritm
 // Strongly connected Components
@@ -731,16 +727,15 @@ void kosaraju(const vector<vector<int>>& graph){
 //
 //      2) Root RULE : DFS from one by one vertex, if root has more than child, this vertex is articulation point
 //      3) Non-Root RULE : e(u, v) in DFS tree, low[v] >= dis[u] then, u is articulation point
-void dfsAP(vector<vector<int>>& graph, vector<bool>& visited, vector<int>& disc, vector<int>& low, int u, int parent, int time, vector<bool>& isAP){
+void dfsAP(vector<vector<int>>& graph, vector<bool>& visited, vector<int>& disc, vector<int>& low, vector<bool>& isAP, int u, int parent, int time){
     visited[u] = true;
-
-    time++;
-    int nChildren = 0;
-    disc[u] = low[u] = time;
+    disc[u] = low[u] = ++time;
+    int children = 0;
     for(int v : graph[u]){
         if(!visited[v]){
-            ++nChildren;
-            dfsAP(graph, visited, disc, low, v, u, time, isAP);
+            ++children;
+
+            dfsAP(graph, visited, disc, low, isAP, v, u, time);
 
             low[u] = min(low[u], low[v]);
 
@@ -748,132 +743,29 @@ void dfsAP(vector<vector<int>>& graph, vector<bool>& visited, vector<int>& disc,
                 isAP[u] = true;
             }
         }
-        else if(parent != v){
-            low[u] = min(low[u], disc[v]);
+        else if(v != parent){
+            low[v] = min(low[v], disc[u]);
         }
     }
-    if(parent == -1 && nChildren > 1){
+    if(parent == -1 && children > 1){
         isAP[u] = true;
     }
 }
 
 vector<int> articualtionPoint(vector<vector<int>>& graph, int n){
-    vector<int> disc(n, INT32_MAX);
-    vector<int> low(n, INT32_MAX);
     vector<bool> visited(n, false);
-
+    vector<int> disc(n, 0);
+    vector<int> low(n, 0);
     vector<bool> isAP(n, false);
 
+    int parent = -1;
     int time = 0;
-    int parent = -1;
-    for(int u=0; u<n; ++u){
-        if(!visited[u]){
-            dfsAP(graph, visited, disc, low, u, parent, time, isAP);
-        }
-    }
-
-    vector<int> aps;
-    for(int i=0; i<isAP.size(); ++i){
-        if(isAP[i]){
-            aps.push_back(i);
-        }
-    }
-    return aps;
-}
-
-// Bridges in edges
-// IDEA : DFS based
-void dfsBE(vector<vector<int>>& graph, vector<bool>& visited, vector<int>& disc, vector<int>& low, int u, int parent, int time, vector<pair<int,int>>& bridges){
-    visited[u] = true;
-
-    disc[u] = low[u] = ++time;
-    for(int v : graph[u]){
-        if(!visited[v]){
-            dfsBE(graph, visited, disc, low, v, u, time, bridges);
-
-            low[u] = min(low[u], low[v]);
-
-            if(low[v] > disc[u]){
-                bridges.push_back(make_pair(u, v));
-            }
-        }
-        else if(parent != v){
-            low[u] = min(low[u], disc[v]);
-        }
-    }
-}
-
-vector<pair<int, int>> articulationBridge(vector<vector<int>>& graph, int n){
-    vector<bool> visited(n, false);
-    vector<int> disc(n, INT32_MAX);
-    vector<int> low(n, INT32_MAX);
-    
-    vector<pair<int, int>> bridges;
-
-    int time=0;
-    int parent = -1;
     for(int i=0; i<n; ++i){
         if(!visited[i]){
-            dfsBE(graph, visited, disc, low, i, parent, time, bridges);
-        }
-    }
-
-    return bridges;
-}
-
-// Tarjan's Algorithm
-// Strongly Connected Components
-// CONDITION:
-//              1) connected graph
-//              2) directed graph
-// IDEA: DFS Based ONLY ONE TRAVERSAL using STACK
-// T/C: O(v+e)
-// S/C: O(v+e) for graph, O(v) for stack
-void dfsTarjan(vector<vector<int>>& graph, vector<bool>& isInStack, vector<int>& disc, vector<int>& low, int u, stack<int>& st, int time){
-    st.push(u);
-    isInStack[u] = true;
-    disc[u] = low[u] = time;
-
-    for(int v : graph[u]){
-        if(disc[v] == -1){
-            dfsTarjan(graph, isInStack, disc, low, v, st, time);
-
-            low[u] = min(low[u], low[v]);
-        }
-        else if(isInStack[v]){
-            low[u] = min(low[u], disc[v]);
-        }
-    }
-
-    int cur = -1;
-    if(low[u] == disc[u]){
-        while(st.top() != u){
-            cur = st.top();
-            st.pop();
-            cout << cur << " ";
-            isInStack[cur] = false;
-        }
-        cur = st.top();
-        st.pop();
-        cout << cur << "\n";
-        isInStack[cur] = false;
-    }
-}
-
-void tarjan(vector<vector<int>>& graph, int n){
-    stack<int> st;
-    vector<bool> isInStack(n, false);
-    vector<int> disc(n, -1);
-    vector<int> low(n, -1);
-
-    int time = 0;
-    for(int i=0; i<n; ++i){
-        if(disc[i] == -1){
-            dfsTarjan(graph, isInStack, disc, low, i, st, time);
+            dfsAP(graph, visited, disc, low, isAP, i, parent, time);
         }
     }
 }
-
 
 int main(){
     
