@@ -302,6 +302,10 @@ std::vector<int> countPrimes(int n){
 std::vector<int> countPrimes2(int n){
 	std::vector<int> primes;
 	std::vector<bool> isPrimeNum(n+1,true);
+	
+	isPrimeNum[0] = false;
+	isPrimeNum[1] = false;
+
 	for(int i{2};i*i<=n;++i){
 		if(isPrime(i)){
 			for(int j{i*i};j<=n;j=j+i){
