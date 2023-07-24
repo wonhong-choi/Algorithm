@@ -192,7 +192,7 @@ int LCM1(int a, int b){
 // a*b=GCD(a,b)*LCM(a,b)
 // Time Complexity : O(log(min(a,b)))
 int LCM(int a,int b){
-	return a*b*GCD(a,b);
+	return a*b/GCD(a,b);
 }
 
 // isPrime
